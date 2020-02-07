@@ -1,5 +1,6 @@
 package com.github.badoualy.telegram.mtproto.transport
 
+import com.github.badoualy.telegram.mtproto.FailureDetector
 import com.github.badoualy.telegram.tl.ByteBufferUtils.*
 import org.slf4j.LoggerFactory
 import org.slf4j.MarkerFactory
@@ -152,8 +153,10 @@ internal class MTProtoTcpConnection
         var totalRead = 0
         while (totalRead < length) {
             val read = socketChannel.read(buffer)
-            if (read == -1)
+            if (read == -1) {
+                FailureDetector.getInstance().failed()
                 throw IOException("Reached end-of-stream")
+            }
 
             totalRead += read
         }
